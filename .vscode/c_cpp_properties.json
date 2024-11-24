@@ -1,0 +1,29 @@
+{
+    "configurations": [
+      {
+        "name": "MinGW64",
+        "intelliSenseMode": "windows-gcc-x64",
+        "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+        "includePath": [
+          "${workspaceFolder}/**",
+          "C:/msys64/mingw64/include",
+          "C:/msys64/mingw64/include/c++/14.1.0",  // Adjust version based on your MSYS2 installation
+          "C:/msys64/mingw64/include/c++/14.1.0/x86_64-w64-mingw32", // Standard library path
+          "${workspaceFolder}/include" // Adjust to include paths in your project, e.g., custom headers
+        ],
+        "defines": [],
+        "cStandard": "c17",
+        "cppStandard": "c++20",
+        "browse": {
+          "path": [
+            "${workspaceFolder}",
+            "C:/msys64/mingw64/include"
+          ],
+          "limitSymbolsToIncludedHeaders": true,
+          "databaseFilename": ""
+        }
+      }
+    ],
+    "version": 4
+  }
+  

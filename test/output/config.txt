@@ -1,0 +1,195 @@
+/*#include <iostream>
+#include <queue>
+#include <algorithm>
+
+template <typename T>
+class AVLTree {
+public:
+    class AVLNode {
+    public:
+        AVLNode(T const& node_value) 
+            : node_value(node_value), node_height(1), 
+              parent_node(nullptr), left_child(nullptr), right_child(nullptr) {}
+
+        T value() const { return node_value; }
+        int height() const { return node_height; }
+        AVLNode* parent() const { return parent_node; }
+        AVLNode* left() const { return left_child; }
+        AVLNode* right() const { return right_child; }
+        bool empty() const { return this == nullptr; }
+        bool isLeaf() const { return !left_child && !right_child; }
+        bool isRoot() const { return !parent_node; }
+
+        T front() const { return left_child ? left_child->front() : node_value; }
+        T back() const { return right_child ? right_child->back() : node_value; }
+
+        bool find(T const &value, AVLNode* &node) {
+            if (node_value == value) {
+                node = this;
+                return true;
+            }
+            if (value < node_value && left_child)
+                return left_child->find(value, node);
+            if (value > node_value && right_child)
+                return right_child->find(value, node);
+            return false;
+        }
+
+        bool insert(T const &value, AVLNode* &root) {
+            if (value < node_value) {
+                if (left_child) {
+                    return left_child->insert(value, root);
+                } else {
+                    left_child = new AVLNode(value);
+                    left_child->parent_node = this;
+                }
+            } else if (value > node_value) {
+                if (right_child) {
+                    return right_child->insert(value, root);
+                } else {
+                    right_child = new AVLNode(value);
+                    right_child->parent_node = this;
+                }
+            } else {
+                return false; // Duplicate value
+            }
+            updateHeight();
+            balance(root);
+            return true;
+        }
+
+        bool erase(T const &value, AVLNode* &root) {
+            if (value < node_value) {
+                if (left_child) return left_child->erase(value, root);
+            } else if (value > node_value) {
+                if (right_child) return right_child->erase(value, root);
+            } else {
+                if (!left_child || !right_child) {
+                    AVLNode* temp = left_child ? left_child : right_child;
+                    if (temp) temp->parent_node = parent_node;
+                    if (this == root) root = temp;
+                    else if (parent_node->left_child == this) parent_node->left_child = temp;
+                    else parent_node->right_child = temp;
+                    delete this;
+                } else {
+                    AVLNode* temp = right_child;
+                    while (temp->left_child) temp = temp->left_child;
+                    node_value = temp->node_value;
+                    return right_child->erase(temp->node_value, root);
+                }
+                if (parent_node) parent_node->updateHeight();
+                return true;
+            }
+            updateHeight();
+            balance(root);
+            return true;
+        }
+
+        void balance(AVLNode* &root) {
+            int balanceFactor = getBalanceFactor();
+            if (balanceFactor > 1) {
+                if (left_child && left_child->getBalanceFactor() < 0)
+                    left_child->rotateLeft();
+                rotateRight();
+            } else if (balanceFactor < -1) {
+                if (right_child && right_child->getBalanceFactor() > 0)
+                    right_child->rotateRight();
+                rotateLeft();
+            }
+            if (!parent_node) root = this;
+        }
+
+    private:
+        T node_value;
+        int node_height;
+        AVLNode* parent_node;
+        AVLNode* left_child;
+        AVLNode* right_child;
+
+        void updateHeight() {
+            node_height = 1 + std::max(leftHeight(), rightHeight());
+        }
+
+        int leftHeight() const { return left_child ? left_child->node_height : 0; }
+        int rightHeight() const { return right_child ? right_child->node_height : 0; }
+
+        int getBalanceFactor() const { return leftHeight() - rightHeight(); }
+
+        void rotateLeft() {
+            AVLNode* newRoot = right_child;
+            right_child = newRoot->left_child;
+            if (right_child) right_child->parent_node = this;
+            newRoot->left_child = this;
+            newRoot->parent_node = parent_node;
+            if (parent_node) {
+                if (parent_node->left_child == this) parent_node->left_child = newRoot;
+                else parent_node->right_child = newRoot;
+            }
+            parent_node = newRoot;
+            updateHeight();
+            newRoot->updateHeight();
+        }
+
+        void rotateRight() {
+            AVLNode* newRoot = left_child;
+            left_child = newRoot->right_child;
+            if (left_child) left_child->parent_node = this;
+            newRoot->right_child = this;
+            newRoot->parent_node = parent_node;
+            if (parent_node) {
+                if (parent_node->left_child == this) parent_node->left_child = newRoot;
+                else parent_node->right_child = newRoot;
+            }
+            parent_node = newRoot;
+            updateHeight();
+            newRoot->updateHeight();
+        }
+    };
+
+    AVLTree() : root_node(nullptr) {}
+
+    AVLNode* root() const { return root_node; }
+    bool empty() const { return root_node == nullptr; }
+    int height() const { return root_node ? root_node->height() : 0; }
+    T front() const { return root_node ? root_node->front() : T(); }
+    T back() const { return root_node ? root_node->back() : T(); }
+    bool find(T const &value) { return root_node ? root_node->find(value, root_node) : false; }
+    bool insert(T const &value) {
+        if (empty()) root_node = new AVLNode(value);
+        else return root_node->insert(value, root_node);
+        return true;
+    }
+    bool erase(T const &value) { return root_node ? root_node->erase(value, root_node) : false; }
+    void level_order_traversal() {
+        if (empty()) return;
+        std::queue<AVLNode*> q;
+        q.push(root_node);
+        while (!q.empty()) {
+            AVLNode* current = q.front();
+            q.pop();
+            std::cout << current->value() << " ";
+            if (current->left()) q.push(current->left());
+            if (current->right()) q.push(current->right());
+        }
+    }
+
+private:
+    AVLNode* root_node;
+};
+
+int main() {
+    AVLTree<int> tree;
+    tree.insert(10);
+    tree.insert(20);
+    tree.insert(30);
+    tree.insert(40);
+    tree.insert(50);
+    tree.insert(25);
+
+    std::cout << "Level-order traversal of AVL Tree: ";
+    tree.level_order_traversal();
+    std::cout << std::endl;
+
+    return 0;
+}
+ */

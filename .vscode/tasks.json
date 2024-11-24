@@ -1,0 +1,43 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Project with Make",
+        "type": "shell",
+        "command": "make",
+        "args": [],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": [
+          "$gcc"
+        ],
+        "group": "build",
+        "detail": "Builds the project using make from MSYS2 MinGW64."
+      },
+      {
+        "type": "cppbuild",
+        "label": "Build with msys2",
+        "command": "C:/msys64/mingw64/bin/g++.exe",
+        "args": [
+          "-fdiagnostics-color=always",
+          "-g",
+          "${file}",
+          "-o",
+          "${fileDirname}\\${fileBasenameNoExtension}.exe"
+        ],
+        "options": {
+          "cwd": "C:/msys64/mingw64/bin"
+        },
+        "problemMatcher": [
+          "$gcc"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "detail": "compiler: C:/msys64/mingw64/bin/g++.exe"
+      }
+    ]
+  }
+  
